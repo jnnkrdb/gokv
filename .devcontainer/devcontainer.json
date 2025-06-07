@@ -5,5 +5,8 @@
     "ghcr.io/robbert229/devcontainer-features/operator-sdk:1": {},
     "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
     "ghcr.io/audacioustux/devcontainers/k9s:1": {}
-  }
+  },
+  "mounts": [
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}\\.kube,target=/home/codespace/.kube,type=bind,consistency=cached"
+  ]
 }
