@@ -1,0 +1,10 @@
+ha:
+  nodes:
+    - uri: localhost-0.gokv-headless.gokv.svc
+      gossipPortTCP: 3453
+    - uri: localhost-1.gokv-headless.gokv.svc
+      gossipPortTCP: 3453
+    - uri: localhost-2.gokv-headless.gokv.svc
+      gossipPortTCP: 3453
+      
+      

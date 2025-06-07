@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/jnnkrdb/gokv/global"
+	"github.com/jnnkrdb/gokv/conf"
 )
 
 func main() {
@@ -17,7 +17,13 @@ func main() {
 
 	for {
 
-		log.Printf("New Line, HomeDir: %s, BinDir: %s", global.GOKV_HOME, global.GOKV_BINARY_PATH)
+		log.Printf("New Line, HomeDir: %s, BinDir: %s", conf.GOKV_HOME, conf.GOKV_BINARY_PATH)
+
+		log.Printf("Nodes:\n")
+
+		for i, node := range conf.NC.HA.Nodes {
+			log.Printf("Node %d: ws://%s:%d", i, node.URI, node.GossipPortTCP)
+		}
 
 		time.Sleep(30 * time.Second)
 	}
