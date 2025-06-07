@@ -21,7 +21,7 @@ WORKDIR /
 RUN apk add --no-cache --update openssl
 # Copy the Directory Contents
 RUN mkdir /opt/gokv
-COPY gokv/ /opt/gokv
+COPY opt/ /opt/gokv
 # create user with home dir
 RUN addgroup -S gokv && adduser -S gokv -H -h /opt/gokv -s /bin/sh -G gokv -u 3453
 # Copy Binary

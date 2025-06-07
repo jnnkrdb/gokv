@@ -2,6 +2,10 @@
 
 set -e
 
+echo "######################################################"
+echo "############### GoKV - KeyValues Store ###############"
+echo "######################################################"
+
 echo "$(date +"%Y-%m-%d - %H:%M:%S") | starting the entrypoint.sh"
 
 # Execute Startup Scripts
