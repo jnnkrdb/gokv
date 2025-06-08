@@ -4,20 +4,15 @@ import (
 	"log"
 	"os"
 
-	"github.com/jnnkrdb/gokv/synchro"
+	"github.com/jnnkrdb/gokv/pkg/synchro"
 	"gopkg.in/yaml.v3"
 )
 
-var (
-	GOKV_HOME        string = ReadEnv("GOKV_HOME", "NONE")
-	GOKV_BINARY_PATH string = ReadEnv("GOKV_BINARY_PATH", "NONE")
-
-	NC *NodeConfig = &NodeConfig{}
-)
+var NC *NodeConfig = &NodeConfig{}
 
 // initialize the service from config file at $GOKV_HOME/gokv.yaml
 func init() {
-	yamlF, err := os.ReadFile(GOKV_HOME + "/gokv.yaml")
+	yamlF, err := os.ReadFile("/opt/gokv/gokv.yaml")
 	if err != nil {
 		log.Fatalf("couldn't read config file: %s", err.Error())
 	}
@@ -34,6 +29,7 @@ type NodeConfig struct {
 
 	// this anonymous struct contains information about the ha cluster
 	HA struct {
-		Nodes []synchro.Host `yaml:"nodes"`
+		Nodes          []synchro.Host `yaml:"nodes"`
+		SyncTimeoutSec int            `yaml:"syncTimeoutSec"`
 	} `yaml:"ha"`
 }

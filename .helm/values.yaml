@@ -1,10 +1,11 @@
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
+  # Set the repository, which is used to receive the image.
   repository: ghcr.io/jnnkrdb/gokv
-  # This sets the pull policy for images.
-  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
+  # This sets the pull policy for images.
+  pullPolicy: Always
   # set imagepullsecret, if neccessary
   pullSecrets: []
 
@@ -16,3 +17,9 @@ pod:
 # This is for setting Kubernetes Labels to a Pod.
 # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   labels: {}
+
+service:
+  gossipPortTCP: 3453
+
+# this section contains the content of the gokv.yaml as raw string in vaml format. will be deployed as configmap
+gokv: 
