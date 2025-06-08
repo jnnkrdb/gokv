@@ -28,11 +28,8 @@ jobs:
         with:
           go-version: '1.22.x'
       
-      - name: Change Dir
-        run: cd ./gokv
-
-      - name: Install Deps
-        run: go mod download
-
-      - name: Test [./gokv/...]
-        run: go test ./gokv/... -v
+      - name: Run Test
+        run: |
+          cd ./gokv
+          go mod download
+          go test . -v
