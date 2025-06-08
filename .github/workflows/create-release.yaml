@@ -45,9 +45,9 @@ jobs:
 
       - name: bash-version
         run: |
-          echo SemVer: ${{ needs.version.outputs.semver }} > ./opt/gokv/VERSION 
-          echo Ref: ${{ github.ref_name }} >> ./opt/gokv/VERSION
-          echo $(cat './opt/gokv/VERSION')
+          echo SemVer: ${{ needs.version.outputs.semver }} > ./opt/VERSION 
+          echo Ref: ${{ github.ref_name }} >> ./opt/VERSION
+          echo $(cat './opt/VERSION')
 
       - name: Build Image Without Push
         uses: docker/build-push-action@v5
