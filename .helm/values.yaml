@@ -53,5 +53,12 @@ service:
 gokv:
   # This is the content of the yaml file. If its empty, then the default will be used.
   yaml: |-
-    this: ""
-    isSoWrong: true
+    ha:
+      nodes: 
+        - uri: gokv-0   
+          gossipPortTCP: 5334
+        - uri: gokv-1
+          gossipPortTCP: 5334
+        - uri: gokv-2
+          gossipPortTCP: 5334
+        

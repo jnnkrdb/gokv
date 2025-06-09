@@ -41,4 +41,7 @@ type NodeConfig struct {
 		Nodes          []synchro.Host `yaml:"nodes"`
 		SyncTimeoutSec int            `yaml:"syncTimeoutSec"`
 	} `yaml:"ha"`
+	Storage struct {
+		Type string `yaml:"type"`
+	} `yaml:"storage"`
 }

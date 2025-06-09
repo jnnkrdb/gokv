@@ -1,7 +1,6 @@
 package local
 
 import (
-	"log"
 	"time"
 
 	"github.com/jnnkrdb/gokv/conf"
@@ -22,11 +21,6 @@ func RunService() {
 	go httpsocket.RunHTTPSocket(conf.HTTP_PORT)
 
 	for {
-		log.Printf("Nodes:\n")
-
-		for i, node := range conf.NC.HA.Nodes {
-			log.Printf("Node %d: ws://%s", i, node.String())
-		}
 
 		time.Sleep(30 * time.Second)
 	}
