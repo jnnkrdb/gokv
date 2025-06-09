@@ -6,6 +6,7 @@ import (
 
 	"github.com/jnnkrdb/gokv/conf"
 	"github.com/jnnkrdb/gokv/local/gossip"
+	httpsocket "github.com/jnnkrdb/gokv/pkg/server/httpSocket"
 	"github.com/jnnkrdb/gokv/pkg/server/tcpSocket"
 )
 
@@ -16,6 +17,9 @@ func RunService() {
 
 	// start gosspi spreading
 	go gossip.SpreadGossip()
+
+	// run http socket
+	go httpsocket.RunHTTPSocket(conf.HTTP_PORT)
 
 	for {
 		log.Printf("Nodes:\n")
