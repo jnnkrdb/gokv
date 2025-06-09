@@ -59,9 +59,9 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: gossip
-              containerPort: {{ default 3453 .Values.service.gossipPortTCP }}
+              containerPort: 5334
             - name: http
-              containerPort: {{ default 80 .Values.service.httpPortTCP }}
+              containerPort: 80
           {{- with .Values.pod.nodeSelector }}
           resources:
             {{ . | toYaml | nindent 12 }}
@@ -74,21 +74,21 @@ spec:
           startupProbe:
             httpGet:
               path: /healthz/live
-              port: {{ default 80 .Values.service.httpPortTCP }}
+              port: 80
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 30
           livenessProbe:
             httpGet:
               path: /healthz/live
-              port: {{ default 80 .Values.service.httpPortTCP }}
+              port: 80
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /healthz/ready
-              port: {{ default 80 .Values.service.httpPortTCP }}
+              port: 80
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3

@@ -12,9 +12,9 @@ spec:
   clusterIP: None
   ports:
     - name: gossip
-      port: {{ default 3453 .Values.service.gossipPortTCP }}
+      port: 5334
       protocol: TCP
-      targetPort: {{ default 3453 .Values.service.gossipPortTCP }}
+      targetPort: 5334
   selector:
     {{- include "gokv.selectorLabels" . | nindent 4 }}
     {{- with .Values.pod.labels }}
@@ -33,9 +33,9 @@ spec:
   type: ClusterIP
   ports:
     - name: http
-      port: {{ default 80 .Values.service.httpPortTCP }}
+      port: 80
       protocol: TCP
-      targetPort: {{ default 80 .Values.service.httpPortTCP }}
+      targetPort: 80
   selector:
     {{- include "gokv.selectorLabels" . | nindent 4 }}
     {{- with .Values.pod.labels }}
