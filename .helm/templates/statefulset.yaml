@@ -52,9 +52,6 @@ spec:
         - name: config
           configMap:
             name: gokv-config
-            items:
-              - key: gokv.yaml
-                path: gokv.yaml      
       {{- end }}
       containers:
         - name: gokv
@@ -71,8 +68,8 @@ spec:
           {{- end }}
           {{- if .Values.gokv.yaml }}
           volumeMounts:
-            - name: config
-              mountPath: /opt/gokv/cfg 
+            - name: gokv-config
+              mountPath: /opt/gokv/cfg
           {{- end }}
           startupProbe:
             httpGet:
