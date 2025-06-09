@@ -1,0 +1,43 @@
+--- # ------------------------------------------------------------------------------------------- Service-headless
+apiVersion: v1
+kind: Service
+metadata:
+  name: gokv-gossip
+  labels:
+    {{- include "gokv.labels" . | nindent 4 }}    
+  annotations:
+    {{- include "gokv.defaultAnnotations" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: gossip
+      port: {{ default 3453 .Values.service.gossipPortTCP }}
+      protocol: TCP
+      targetPort: {{ default 3453 .Values.service.gossipPortTCP }}
+  selector:
+    {{- include "gokv.selectorLabels" . | nindent 4 }}
+    {{- with .Values.pod.labels }}
+    {{- . | toYaml | nindent 4 }}
+    {{- end }}
+--- # ------------------------------------------------------------------------------------------- Service-headless
+apiVersion: v1
+kind: Service
+metadata:
+  name: gokv
+  labels:
+    {{- include "gokv.labels" . | nindent 4 }}    
+  annotations:
+    {{- include "gokv.defaultAnnotations" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: {{ default 80 .Values.service.httpPortTCP }}
+      protocol: TCP
+      targetPort: {{ default 80 .Values.service.httpPortTCP }}
+  selector:
+    {{- include "gokv.selectorLabels" . | nindent 4 }}
+    {{- with .Values.pod.labels }}
+    {{- . | toYaml | nindent 4 }}
+    {{- end }}

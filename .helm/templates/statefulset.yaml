@@ -3,29 +3,95 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: gokv
+  labels:
+    {{- include "gokv.labels" . | nindent 4 }}    
+  annotations:
+    {{- include "gokv.defaultAnnotations" . | nindent 4 }}
 spec:
+  replicas: 3
+  revisionHistoryLimit: 3
+  minReadySeconds: 10
+  serviceName: gokv-gossip
   selector:
     matchLabels:
-      app: gokv
-  serviceName: "gokv-headless"
-  replicas: 3
-  minReadySeconds: 10
+      {{- include "gokv.selectorLabels" . | nindent 6 }}    
   template:
     metadata:
+      annotations:
+        {{- include "gokv.defaultAnnotations" . | nindent 8 }}
+        {{- with .Values.pod.annotations }}
+        {{- . | toYaml | nindent 8 }}
+        {{- end }}
       labels:
-        app: gokv
+        {{- include "gokv.selectorLabels" . | nindent 8 }}    
+        {{- with .Values.pod.labels }}
+        {{- . | toYaml | nindent 8 }}
+        {{- end }}
     spec:
-      containers:
-      - name: gokv
-        image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        ports:
-        - name: gossip
-          containerPort: {{ .Values.service.gossipPortTCP }}
-        volumeMounts:
-        - name: config
-          mountPath: /opt/gokv
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- range .Values.global.imagePullSecrets }}
+        - name: {{ . | quote }}
+        {{- end }}
+      {{- end }}
+      {{- with .Values.pod.affinity }}
+      affinity:
+        {{ . | toYaml | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pod.tolerations }}
+      tolerations:
+        {{ . | toYaml | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pod.nodeSelector }}
+      nodeSelector:
+        {{ . | toYaml | nindent 8 }}
+      {{- end }}
+      serviceAccountName: sa-gokv
+      {{- if .Values.gokv.yaml }}
       volumes:
         - name: config
           configMap:
             name: gokv-config
+            items:
+              - key: gokv.yaml
+                path: gokv.yaml      
+      {{- end }}
+      containers:
+        - name: gokv
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: gossip
+              containerPort: {{ default 3453 .Values.service.gossipPortTCP }}
+            - name: http
+              containerPort: {{ default 80 .Values.service.httpPortTCP }}
+          {{- with .Values.pod.nodeSelector }}
+          resources:
+            {{ . | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.gokv.yaml }}
+          volumeMounts:
+            - name: config
+              mountPath: /opt/gokv  
+          {{- end }}
+          startupProbe:
+            httpGet:
+              path: /healthz/live
+              port: {{ default 80 .Values.service.httpPortTCP }}
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: {{ default 80 .Values.service.httpPortTCP }}
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: {{ default 80 .Values.service.httpPortTCP }}
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

@@ -4,3 +4,7 @@ description: Deploy GoKV Key Value Store.
 type: application
 version: 0.1.0
 appVersion: master
+kubeVersion: ">=1.25.0-0"
+home: "https://github.com/jnnkrdb/gokv"
+maintainers:
+  - name: Jannek

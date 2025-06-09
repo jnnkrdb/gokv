@@ -1,0 +1,164 @@
+---
+# Source: gokv/templates/serviceaccount.yaml
+# ------------------------------------------------------------------------------------------- ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sa-gokv
+  labels:
+    jnnkrdb.de/chart: gokv-0.1.0
+    helm.sh/chart: gokv-0.1.0
+    jnnkrdb.de/service: gokv
+    jnnkrdb.de/instance: release-name
+    app.kubernetes.io/version: "master"
+    app.kubernetes.io/managed-by: Helm    
+  annotations:
+    jnnkrdb.de/source: "github.com/jnnkrdb/gokv"
+automountServiceAccountToken: true
+---
+# Source: gokv/templates/configmap.yaml
+# ------------------------------------------------------------------------------------------- ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gokv-config
+  labels:
+    jnnkrdb.de/chart: gokv-0.1.0
+    helm.sh/chart: gokv-0.1.0
+    jnnkrdb.de/service: gokv
+    jnnkrdb.de/instance: release-name
+    app.kubernetes.io/version: "master"
+    app.kubernetes.io/managed-by: Helm    
+  annotations:
+    jnnkrdb.de/source: "github.com/jnnkrdb/gokv"
+data:
+  gokv.yaml: |-
+   this: ""
+   isSoWrong: true
+---
+# Source: gokv/templates/service.yaml
+# ------------------------------------------------------------------------------------------- Service-headless
+apiVersion: v1
+kind: Service
+metadata:
+  name: gokv-gossip
+  labels:
+    jnnkrdb.de/chart: gokv-0.1.0
+    helm.sh/chart: gokv-0.1.0
+    jnnkrdb.de/service: gokv
+    jnnkrdb.de/instance: release-name
+    app.kubernetes.io/version: "master"
+    app.kubernetes.io/managed-by: Helm    
+  annotations:
+    jnnkrdb.de/source: "github.com/jnnkrdb/gokv"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: gossip
+      port: 3453
+      protocol: TCP
+      targetPort: 3453
+  selector:
+    jnnkrdb.de/service: gokv
+    jnnkrdb.de/instance: release-name
+---
+# Source: gokv/templates/service.yaml
+# ------------------------------------------------------------------------------------------- Service-headless
+apiVersion: v1
+kind: Service
+metadata:
+  name: gokv
+  labels:
+    jnnkrdb.de/chart: gokv-0.1.0
+    helm.sh/chart: gokv-0.1.0
+    jnnkrdb.de/service: gokv
+    jnnkrdb.de/instance: release-name
+    app.kubernetes.io/version: "master"
+    app.kubernetes.io/managed-by: Helm    
+  annotations:
+    jnnkrdb.de/source: "github.com/jnnkrdb/gokv"
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    jnnkrdb.de/service: gokv
+    jnnkrdb.de/instance: release-name
+---
+# Source: gokv/templates/statefulset.yaml
+# ------------------------------------------------------------------------------------------- StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gokv
+  labels:
+    jnnkrdb.de/chart: gokv-0.1.0
+    helm.sh/chart: gokv-0.1.0
+    jnnkrdb.de/service: gokv
+    jnnkrdb.de/instance: release-name
+    app.kubernetes.io/version: "master"
+    app.kubernetes.io/managed-by: Helm    
+  annotations:
+    jnnkrdb.de/source: "github.com/jnnkrdb/gokv"
+spec:
+  replicas: 3
+  revisionHistoryLimit: 3
+  minReadySeconds: 10
+  serviceName: gokv-gossip
+  selector:
+    matchLabels:
+      jnnkrdb.de/service: gokv
+      jnnkrdb.de/instance: release-name    
+  template:
+    metadata:
+      annotations:
+        jnnkrdb.de/source: "github.com/jnnkrdb/gokv"
+      labels:
+        jnnkrdb.de/service: gokv
+        jnnkrdb.de/instance: release-name
+    spec:
+      serviceAccountName: sa-gokv
+      volumes:
+        - name: config
+          configMap:
+            name: gokv-config
+            items:
+              - key: gokv.yaml
+                path: gokv.yaml
+      containers:
+        - name: gokv
+          image: "ghcr.io/jnnkrdb/gokv:master"
+          imagePullPolicy: Always
+          ports:
+            - name: gossip
+              containerPort: 3453
+            - name: http
+              containerPort: 80
+          volumeMounts:
+            - name: config
+              mountPath: /opt/gokv
+          startupProbe:
+            httpGet:
+              path: /healthz/live
+              port: 80
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: 80
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: 80
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

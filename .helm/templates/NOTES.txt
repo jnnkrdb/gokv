@@ -1,0 +1,9 @@
+################### GoKV KeyValue-Store ###################
+Sources and Versions:
+  - GoKV:
+      Repository: {{ .Values.image.repository }}
+         Version: {{ default .Chart.AppVersion .Values.image.tag }}
+    
+This HelmChart was created by @jnnkrdb.
+If you have any questions or issues, please contact me via GitHub:
+  -> https://github.com/jnnkrdb/gokv/issues

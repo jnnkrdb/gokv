@@ -8,5 +8,18 @@
   },
   "mounts": [
     "source=${localEnv:HOME}${localEnv:USERPROFILE}\\.kube,target=/home/codespace/.kube,type=bind,consistency=cached"
-  ]
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Vue.volar",
+        "rangav.vscode-thunder-client",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker",
+        "docker.docker",
+        "Tim-Koehler.helm-intellisense"
+      ]
+    }
+  }
 }
