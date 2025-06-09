@@ -8,7 +8,7 @@ metadata:
   annotations:
     {{- include "gokv.defaultAnnotations" . | nindent 4 }}
 spec:
-  replicas: 3
+  replicas: {{ default 3 .Values.service.replicas }}
   revisionHistoryLimit: 3
   minReadySeconds: 10
   serviceName: gokv-gossip
@@ -68,7 +68,7 @@ spec:
           {{- end }}
           {{- if .Values.gokv.yaml }}
           volumeMounts:
-            - name: gokv-config
+            - name: config
               mountPath: /opt/gokv/cfg
           {{- end }}
           startupProbe:

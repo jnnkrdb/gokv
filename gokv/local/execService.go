@@ -12,7 +12,7 @@ import (
 func RunService() {
 
 	// start tcp socket
-	go tcpSocket.RunTCPSocket(3452, gossip.ReceiveGossip)
+	go tcpSocket.RunTCPSocket(conf.GOSSIP_PORT, gossip.ReceiveGossip)
 
 	// start gosspi spreading
 	go gossip.SpreadGossip()

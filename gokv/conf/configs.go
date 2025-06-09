@@ -8,7 +8,15 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var NC *NodeConfig = &NodeConfig{}
+var (
+	NC *NodeConfig = &NodeConfig{}
+
+	// these ports are used for communication for
+	// client to server and server to server
+
+	HTTP_PORT   int
+	GOSSIP_PORT int
+)
 
 // initialize the service from config file at $GOKV_HOME/gokv.yaml
 func init() {
