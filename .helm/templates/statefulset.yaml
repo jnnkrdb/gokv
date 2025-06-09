@@ -72,7 +72,7 @@ spec:
           {{- if .Values.gokv.yaml }}
           volumeMounts:
             - name: config
-              mountPath: /opt/gokv  
+              mountPath: /opt/gokv/cfg 
           {{- end }}
           startupProbe:
             httpGet:

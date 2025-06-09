@@ -12,7 +12,7 @@ var NC *NodeConfig = &NodeConfig{}
 
 // initialize the service from config file at $GOKV_HOME/gokv.yaml
 func init() {
-	yamlF, err := os.ReadFile("/opt/gokv/gokv.yaml")
+	yamlF, err := os.ReadFile("/opt/gokv/cfg/gokv.yaml")
 	if err != nil {
 		log.Fatalf("couldn't read config file: %s", err.Error())
 	}
