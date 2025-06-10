@@ -9,7 +9,16 @@ func CreateCacheStorage() CacheStorage {
 }
 
 // -------------------------------------------------------------- required functions
-func (cs CacheStorage) Get(bucket, key string) (string, error) {
+
+func (cs CacheStorage) ListBuckets() ([]string, error) {
+	return []string{}, fmt.Errorf("CacheStorage.ListBuckets not implemented")
+}
+
+func (cs CacheStorage) ListKeys(bucket string) ([]string, error) {
+	return []string{}, fmt.Errorf("CacheStorage.ListKeys not implemented")
+}
+
+func (cs CacheStorage) GetKey(bucket, key string) (string, error) {
 	return "", fmt.Errorf("CacheStorage.GetValue not implemented")
 }
 
