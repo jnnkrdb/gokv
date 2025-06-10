@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: gokv-gossip
+  name: gokv-ws
   labels:
     {{- include "gokv.labels" . | nindent 4 }}    
   annotations:
@@ -11,7 +11,7 @@ spec:
   type: ClusterIP
   clusterIP: None
   ports:
-    - name: gossip
+    - name: ws
       port: 5334
       protocol: TCP
       targetPort: 5334
@@ -20,7 +20,31 @@ spec:
     {{- with .Values.pod.labels }}
     {{- . | toYaml | nindent 4 }}
     {{- end }}
---- # ------------------------------------------------------------------------------------------- Service-headless
+--- # ------------------------------------------------------------------------------------------- Service-gossip nodePort
+{{- if .Values.service.ws.nodeport }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: gokv-ws-nodeport
+  labels:
+    {{- include "gokv.labels" . | nindent 4 }}    
+  annotations:
+    {{- include "gokv.defaultAnnotations" . | nindent 4 }}
+spec:
+  type: NodePort
+  ports:
+    - name: ws
+      port: 5334
+      protocol: TCP
+      targetPort: 5334
+      nodePort: {{ .Values.service.http.nodeport }}
+  selector:
+    {{- include "gokv.selectorLabels" . | nindent 4 }}
+    {{- with .Values.pod.labels }}
+    {{- . | toYaml | nindent 4 }}
+    {{- end }}
+{{- end }}
+--- # ------------------------------------------------------------------------------------------- Service-http
 apiVersion: v1
 kind: Service
 metadata:

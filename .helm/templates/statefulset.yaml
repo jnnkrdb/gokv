@@ -67,7 +67,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.uid
           ports:
-            - name: gossip
+            - name: ws
               containerPort: 5334
             - name: http
               containerPort: 80

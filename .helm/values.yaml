@@ -40,6 +40,10 @@ pod:
 # This section sets the default service configs.
 service:
 
+  # Set an nodePort for gossip/ws if required.
+  ws:
+    nodePort: 30534
+    
   # Set the http port for http connections.
   http:
     nodeport: 30888
