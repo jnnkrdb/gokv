@@ -11,6 +11,9 @@ import (
 
 func RunService() {
 
+	// load the storage backend
+	conf.LoadStorage()
+
 	// start tcp socket
 	go tcpSocket.RunTCPSocket(conf.GOSSIP_PORT, gossip.ReceiveGossip)
 
