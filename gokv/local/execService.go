@@ -5,9 +5,8 @@ import (
 	"time"
 
 	"github.com/jnnkrdb/gokv/conf"
-	"github.com/jnnkrdb/gokv/local/gossip"
 	httpsocket "github.com/jnnkrdb/gokv/pkg/server/httpSocket"
-	"github.com/jnnkrdb/gokv/pkg/server/tcpSocket"
+	websocket "github.com/jnnkrdb/gokv/pkg/server/webSocket"
 )
 
 func RunService() {
@@ -16,7 +15,9 @@ func RunService() {
 	conf.LoadStorage()
 
 	// start tcp socket
-	go tcpSocket.RunTCPSocket(conf.GOSSIP_PORT, gossip.ReceiveGossip)
+	//go tcpSocket.RunTCPSocket(conf.GOSSIP_PORT, gossip.ReceiveGossip)
+
+	go websocket.RunWS(conf.GOSSIP_PORT)
 
 	go func() {
 		if conf.NC.Debug {
