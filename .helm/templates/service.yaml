@@ -37,7 +37,7 @@ spec:
       port: 5334
       protocol: TCP
       targetPort: 5334
-      nodePort: {{ .Values.service.http.nodeport }}
+      nodePort: {{ .Values.service.ws.nodeport }}
   selector:
     {{- include "gokv.selectorLabels" . | nindent 4 }}
     {{- with .Values.pod.labels }}
