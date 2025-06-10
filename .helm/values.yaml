@@ -39,12 +39,10 @@ pod:
 
 # This section sets the default service configs.
 service:
-  
-  # Set the tcp port which is used to listen for gossip.
-  gossipPortTCP: 3453
 
   # Set the http port for http connections.
-  httpPortTCP: 80
+  http:
+    nodeport: 30888
 
   # Amount of pods requested.
   replicas: 3

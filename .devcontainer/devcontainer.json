@@ -13,7 +13,6 @@
     "vscode": {
       "extensions": [
         "Vue.volar",
-        "rangav.vscode-thunder-client",
         "ms-kubernetes-tools.vscode-kubernetes-tools",
         "redhat.vscode-yaml",
         "ms-azuretools.vscode-docker",

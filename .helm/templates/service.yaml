@@ -30,12 +30,19 @@ metadata:
   annotations:
     {{- include "gokv.defaultAnnotations" . | nindent 4 }}
 spec:
+  {{- if .Values.service.http.nodeport }}
+  type: NodePort
+  {{- else }}
   type: ClusterIP
+  {{- end }}
   ports:
     - name: http
       port: 80
       protocol: TCP
       targetPort: 80
+      {{- with .Values.service.http.nodeport }}
+      nodePort: {{ . }}
+      {{- end }}
   selector:
     {{- include "gokv.selectorLabels" . | nindent 4 }}
     {{- with .Values.pod.labels }}

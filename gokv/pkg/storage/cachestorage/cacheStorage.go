@@ -1,6 +1,9 @@
 package cachestorage
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 type CacheStorage map[string]map[string]string
 
@@ -44,6 +47,13 @@ func (cs CacheStorage) GetKey(bucket, key string) (string, error) {
 }
 
 func (cs CacheStorage) Write(bucket, key, value string) error {
+	if tmp, ok := cs[bucket]; !ok {
+		log.Printf("[ERR] couldn't indicate map: %v", tmp)
+	} else {
+		if tmp == nil {
+			log.Printf("[WRN] empty map: %v", tmp)
+		}
+	}
 	cs[bucket][key] = value
 	return nil
 }
