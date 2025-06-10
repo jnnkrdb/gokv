@@ -1,23 +1,15 @@
 package storage
 
-import (
-	"github.com/jnnkrdb/gokv/conf"
-)
-
-var STORAGE Storage
-
-func init() {
-	if conf.NC.Storage.Type == "cache" {
-		STORAGE = make(CacheStorage)
-	}
-}
-
+// this is the typical interface to describe the structure
+// of a storage implementation
 type Storage interface {
-	GetValue(string, string) string
-	WriteValue(string, string, string)
+
+	// receive a specific key-value from a bucket
+	Get(string, string) (string, error)
+
+	// write a defined key-value into a given bucket
+	Write(string, string, string) error
+
+	// delete a specific key-value from a bucket
+	Delete(string, string) error
 }
-
-type CacheStorage map[string]map[string]string
-
-func (cs CacheStorage) GetValue(bucket, key string) string
-func (cs CacheStorage) WriteValue(bucket, key, value string)
