@@ -18,6 +18,11 @@ func (cs CacheStorage) ListBuckets() ([]string, error) {
 	return bucketList, nil
 }
 
+func (cs CacheStorage) DeleteBucket(bucket string) error {
+	delete(cs, bucket)
+	return nil
+}
+
 func (cs CacheStorage) ListKeys(bucket string) ([]string, error) {
 	var keyList = []string{}
 	for keyKey := range cs[bucket] {
@@ -43,7 +48,7 @@ func (cs CacheStorage) Write(bucket, key, value string) error {
 	return nil
 }
 
-func (cs CacheStorage) Delete(bucket, key string) error {
+func (cs CacheStorage) DeleteKey(bucket, key string) error {
 	delete(cs[bucket], key)
 	return nil
 }

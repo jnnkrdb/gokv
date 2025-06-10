@@ -41,6 +41,11 @@ type NodeConfig struct {
 		Nodes          []synchro.Host `yaml:"nodes"`
 		SyncTimeoutSec int            `yaml:"syncTimeoutSec"`
 	} `yaml:"ha"`
+
+	// this key says if the debug function should be enabled
+	Debug bool `yaml:"debug"`
+
+	// this section handles the stoarge configs
 	Storage struct {
 		Type string `yaml:"type"`
 	} `yaml:"storage"`

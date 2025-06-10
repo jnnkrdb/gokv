@@ -6,6 +6,7 @@ ha:
       gossipPortTCP: 5334
     - uri: gokv-2
       gossipPortTCP: 5334
+debug: false
 storage:
   type: cache
       
