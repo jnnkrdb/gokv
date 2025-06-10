@@ -47,18 +47,13 @@ func (cs CacheStorage) GetKey(bucket, key string) (string, error) {
 }
 
 func (cs CacheStorage) Write(bucket, key, value string) error {
-	if tmp, ok := cs[bucket]; !ok {
-		log.Printf("[WRN] couldn't indicate map -> creating new one: %v", tmp)
+	if _, ok := cs[bucket]; !ok {
+		log.Printf("[WRN] couldn't indicate bucketMap -> creating new one\n")
 		cs[bucket] = make(map[string]string)
 	}
 	if tmp, ok := cs[bucket]; !ok {
-		log.Printf("[WRN] couldn't indicate map: %v", tmp)
-		return fmt.Errorf("no map found")
-	} else {
-		if tmp == nil {
-			log.Printf("[WRN] empty map: %v", tmp)
-			return fmt.Errorf("cache insufficient")
-		}
+		log.Printf("[WRN] couldn't indicate bucketMap: %v", tmp)
+		return fmt.Errorf("no bucketMap found")
 	}
 	cs[bucket][key] = value
 	return nil

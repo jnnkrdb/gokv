@@ -5,12 +5,12 @@ import (
 	"log"
 	"net"
 
-	"github.com/jnnkrdb/gokv/pkg/messaging"
+	"github.com/jnnkrdb/gokv/local/gossip/functions"
 	"github.com/jnnkrdb/gokv/pkg/server/tcpSocket"
 )
 
 // this function handles the incomming gossip tcp connections and
-// handles the response
+// handles the responses
 func ReceiveGossip(c net.Conn) {
 	defer c.Close()
 
@@ -19,22 +19,15 @@ func ReceiveGossip(c net.Conn) {
 	var resp = tcpSocket.TCPResponse{}
 
 	if err := decoder.Decode(&req); err != nil {
-
 		log.Printf("[WRN] error decoding to json: %v\n", err)
 		log.Printf("[WRN] dropping request\n")
-
-		resp.RequestType = messaging.RT_Dropped
-		resp.RequestCode = messaging.RC_Error
-		resp.Load = "error decoding payload from json"
-
-		tcpSocket.SendJSON(c, resp)
 		return
 	}
 
-	log.Printf("[INF] received request: Type [%s], Code [%s]\n", req.RequestType.String(), req.RequestCode.String())
+	resp.Initiator = req.Initiator
+	resp.RequestCmd = req.RequestCmd
 
-	resp.RequestType = req.RequestType
-	resp.Load = `{"msg":"received your request successfully!"}`
+	functions.Handle(*req, &resp)
 	tcpSocket.SendJSON(c, resp)
 	return
 }

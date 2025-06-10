@@ -16,21 +16,37 @@ const (
 )
 
 var (
-	NC *NodeConfig = &NodeConfig{}
+	SELF_NAME string
+	SELF_UID  string
+	NC        *NodeConfig = &NodeConfig{}
 )
 
 // initialize the service from config file at $GOKV_HOME/gokv.yaml
 func init() {
 	yamlF, err := os.ReadFile("/opt/gokv/cfg/gokv.yaml")
 	if err != nil {
-		log.Fatalf("couldn't read config file: %s", err.Error())
+		log.Fatalf("[ERR] couldn't read config file: %s\n", err.Error())
 	}
 
 	err = yaml.Unmarshal(yamlF, NC)
 	if err != nil {
-		log.Fatalf("couldn't parse config file: %s", err.Error())
+		log.Fatalf("[ERR] couldn't parse config file: %s\n", err.Error())
 	}
 
+	if s, ok := os.LookupEnv("INSTANCE_NAME"); ok {
+		SELF_NAME = s
+	} else {
+		if s, err := os.Hostname(); err != nil {
+			log.Fatalf("[ERR] where is my hostname?: %s\n", err.Error())
+		} else {
+			SELF_NAME = s
+		}
+	}
+	if s, ok := os.LookupEnv("INSTANCE_UID"); ok {
+		SELF_UID = s
+	} else {
+		SELF_UID = ""
+	}
 }
 
 // this struct is parsed from an config yaml

@@ -57,6 +57,15 @@ spec:
         - name: gokv
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:          
+            - name: INSTANCE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: INSTANCE_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
           ports:
             - name: gossip
               containerPort: 5334

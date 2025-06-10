@@ -18,9 +18,6 @@ func RunService() {
 	// start tcp socket
 	go tcpSocket.RunTCPSocket(conf.GOSSIP_PORT, gossip.ReceiveGossip)
 
-	// start gosspi spreading
-	go gossip.SpreadGossip()
-
 	go func() {
 		if conf.NC.Debug {
 			for {
