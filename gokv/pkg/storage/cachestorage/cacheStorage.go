@@ -11,21 +11,39 @@ func CreateCacheStorage() CacheStorage {
 // -------------------------------------------------------------- required functions
 
 func (cs CacheStorage) ListBuckets() ([]string, error) {
-	return []string{}, fmt.Errorf("CacheStorage.ListBuckets not implemented")
+	var bucketList = []string{}
+	for bucketKey := range cs {
+		bucketList = append(bucketList, bucketKey)
+	}
+	return bucketList, nil
 }
 
 func (cs CacheStorage) ListKeys(bucket string) ([]string, error) {
-	return []string{}, fmt.Errorf("CacheStorage.ListKeys not implemented")
+	var keyList = []string{}
+	for keyKey := range cs[bucket] {
+		keyList = append(keyList, keyKey)
+	}
+	return keyList, nil
 }
 
 func (cs CacheStorage) GetKey(bucket, key string) (string, error) {
-	return "", fmt.Errorf("CacheStorage.GetValue not implemented")
+	b, ok := cs[bucket]
+	if !ok {
+		return "", fmt.Errorf("bucket %s does not exist or couldn't be found", bucket)
+	}
+	v, ok := b[key]
+	if !ok {
+		return "", fmt.Errorf("key [%s/%s] does not exist or couldn't be found", bucket, key)
+	}
+	return v, nil
 }
 
 func (cs CacheStorage) Write(bucket, key, value string) error {
-	return fmt.Errorf("CacheStorage.WriteValue not implemented")
+	cs[bucket][key] = value
+	return nil
 }
 
 func (cs CacheStorage) Delete(bucket, key string) error {
-	return fmt.Errorf("CacheStorage.DeleteKey not implemented")
+	delete(cs[bucket], key)
+	return nil
 }
