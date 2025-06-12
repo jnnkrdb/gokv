@@ -11,44 +11,17 @@ import (
 var upgrader = websocket.Upgrader{}
 
 func RunWS(port int) {
-	http.HandleFunc("/echo", echo)
-	http.HandleFunc("/", home)
+	http.HandleFunc(WebsocketPath, func(w http.ResponseWriter, r *http.Request) {
+
+		// upgrade the connection to a websocket
+		c, err := upgrader.Upgrade(w, r, WsHeader)
+		if err != nil {
+			log.Printf("[WRN][%s] error upgrading to websocket conn\n", r.URL.String())
+			return
+		}
+
+		HandleWebSocketConnection(r.Header.Get("gokv.jnnkrdb.de/node"), c)
+	})
+
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
-
-}
-
-func home(w http.ResponseWriter, r *http.Request) {
-
-	homeTemplate.Execute(w, "ws://"+r.Host+"/echo")
-}
-
-func echo(w http.ResponseWriter, r *http.Request) {
-
-	c, err := upgrader.Upgrade(w, r, nil)
-
-	if err != nil {
-		log.Print("upgrade:", err)
-		return
-	}
-
-	defer c.Close()
-
-	for {
-
-		mt, message, err := c.ReadMessage()
-
-		if err != nil {
-			log.Println("read:", err)
-			break
-		}
-
-		log.Printf("recv: %s", message)
-
-		err = c.WriteMessage(mt, message)
-
-		if err != nil {
-			log.Println("write:", err)
-			break
-		}
-	}
 }

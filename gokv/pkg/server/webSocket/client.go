@@ -4,48 +4,48 @@ import (
 	"fmt"
 	"log"
 	"net/url"
-	"os"
-	"os/signal"
-	"time"
+	"strings"
 
 	"github.com/gorilla/websocket"
+	"github.com/jnnkrdb/gokv/conf"
 )
 
-func runClient(port int) {
+// create the required connections to the other nodes
+func CreateWSConnections() {
 
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt)
+	for _, node := range conf.NC.HA.Nodes {
 
-	u := url.URL{Scheme: "ws", Host: fmt.Sprintf(":%d", port), Path: "/echo"}
-	log.Printf("connecting to %s", u.String())
-
-	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
-	if err != nil {
-		log.Fatal("dial:", err)
-	}
-	defer c.Close()
-
-	done := make(chan struct{})
-
-	go func() {
-		defer close(done)
-		for {
-			_, message, err := c.ReadMessage()
-			if err != nil {
-				log.Println("read:", err)
-				return
-			}
-			log.Printf("recv: %s", message)
+		if strings.Contains(node, conf.SELF_NAME) {
+			continue
 		}
-	}()
+
+		// create url
+		u := url.URL{
+			Scheme: "ws",
+			Host:   fmt.Sprintf("%s:%d", node, conf.GOSSIP_PORT),
+			Path:   WebsocketPath,
+		}
+		log.Printf("[INF] connecting to url: %s\n", u.String())
+
+		if c, _, err := websocket.DefaultDialer.Dial(u.String(), WsHeader); err != nil {
+
+			log.Printf("[ERR] couldn't connect to [%s]: %v\n", u.String(), err)
+
+		} else {
+
+			HandleWebSocketConnection(node, c)
+		}
+	}
+}
+
+/*
+func runClient(port int) {
 
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
 	for {
 		select {
-		case <-done:
-			return
 		case t := <-ticker.C:
 			err := c.WriteMessage(websocket.TextMessage, []byte(t.String()))
 			if err != nil {
@@ -70,3 +70,4 @@ func runClient(port int) {
 		}
 	}
 }
+*/

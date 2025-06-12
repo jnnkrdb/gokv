@@ -20,7 +20,10 @@ const (
 )
 
 func SyncStorage(rsp *tcpSocket.TCPResponse) {
+
 	log.Printf("[WRN] method not implemented\n")
+
 	rsp.RequestState = messaging.RS_Warning
+
 	rsp.Load = []byte("the syncStorage method is not implemented")
 }
