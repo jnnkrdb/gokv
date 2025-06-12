@@ -22,8 +22,8 @@ var (
 )
 
 func init() {
-	WsHeader.Add("gokv.jnnkrdb.de/node", conf.SELF_NAME)
-	WsHeader.Add("gokv.jnnkrdb.de/auth", conf.SELF_UID)
+	WsHeader.Add("x-gokv-node", conf.SELF_NAME)
+	WsHeader.Add("x-gokv-auth", conf.SELF_UID)
 }
 
 type WsPool map[string]*websocket.Conn
