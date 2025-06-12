@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	WebsocketPath string = "/gossip"
+	WebsocketPath string = "/"
 )
 
 var (

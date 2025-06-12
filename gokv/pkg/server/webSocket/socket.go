@@ -5,13 +5,25 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{}
+var (
+	upgrader = websocket.Upgrader{}
+
+	wsRouter *mux.Router = mux.NewRouter()
+)
 
 func RunWS(port int) {
-	http.HandleFunc(WebsocketPath, func(w http.ResponseWriter, r *http.Request) {
+
+	// handle the connections api
+	wsRouter.HandleFunc("/api/v1/connections", func(w http.ResponseWriter, r *http.Request) {
+
+	}).Methods("GET", "OPTIONS")
+
+	// handle the websocket registration
+	wsRouter.HandleFunc(WebsocketPath, func(w http.ResponseWriter, r *http.Request) {
 
 		// upgrade the connection to a websocket
 		c, err := upgrader.Upgrade(w, r, WsHeader)

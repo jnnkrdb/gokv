@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	apiv1_connections "github.com/jnnkrdb/gokv/pkg/server/httpSocket/api/v1/connections"
 	apiv1_storage "github.com/jnnkrdb/gokv/pkg/server/httpSocket/api/v1/storage"
 )
 
@@ -23,9 +22,6 @@ func RunHTTPSocket(port int) {
 	router.Handle("/api/v1/storage/buckets/{bucket}/keys/{key}/value", http.HandlerFunc(apiv1_storage.WrityKey)).Methods("POST", "PUT", "PATCH", "OPTIONS")
 	router.Handle("/api/v1/storage/buckets/{bucket}/keys/{key}", http.HandlerFunc(apiv1_storage.DeleteKey)).Methods("DELETE", "OPTIONS")
 	router.Handle("/api/v1/storage/buckets/{bucket}", http.HandlerFunc(apiv1_storage.DeleteBucket)).Methods("DELETE", "OPTIONS")
-
-	// handle the connections api
-	router.Handle("/api/v1/connections", http.HandlerFunc(apiv1_connections.ListConnections)).Methods("GET", "OPTIONS")
 
 	// handle healthz api
 	router.Handle("/healthz/live", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("OK")) }))

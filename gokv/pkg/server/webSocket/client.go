@@ -10,6 +10,17 @@ import (
 	"github.com/jnnkrdb/gokv/conf"
 )
 
+type NodePool struct {
+	Nodes []string `json:"nodes"`
+}
+
+// the init function tries to connect to the service inside the cluster, to
+// gather the current nodes in the gokv-cluster. Then tries to open a connection
+// to every node
+func init() {
+
+}
+
 // create the required connections to the other nodes
 func CreateWSConnections() {
 
@@ -27,7 +38,7 @@ func CreateWSConnections() {
 		}
 		log.Printf("[INF] connecting to url: %s\n", u.String())
 
-		if c, _, err := websocket.DefaultDialer.Dial(u.String(), WsHeader); err != nil {
+		if c, _, err := websocket.DefaultDialer.Dial(u.String(), nil); err != nil {
 
 			log.Printf("[ERR] couldn't connect to [%s]: %v\n", u.String(), err)
 
