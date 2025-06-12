@@ -11,7 +11,7 @@ spec:
   replicas: {{ default 3 .Values.service.replicas }}
   revisionHistoryLimit: 3
   minReadySeconds: 10
-  serviceName: gokv-gossip
+  serviceName: gokv-ws
   selector:
     matchLabels:
       {{- include "gokv.selectorLabels" . | nindent 6 }}    

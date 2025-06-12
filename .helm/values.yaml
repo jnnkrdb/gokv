@@ -57,12 +57,9 @@ gokv:
   yaml: |-
     ha:
       nodes: 
-        - uri: gokv-0   
-          gossipPortTCP: 5334
-        - uri: gokv-1
-          gossipPortTCP: 5334
-        - uri: gokv-2
-          gossipPortTCP: 5334
+        - gokv-0.gokv-ws.default
+        - gokv-1.gokv-ws.default
+        - gokv-2.gokv-ws.default
     debug: true
     storage:
       type: cache

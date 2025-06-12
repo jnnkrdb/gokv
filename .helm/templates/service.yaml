@@ -1,4 +1,4 @@
---- # ------------------------------------------------------------------------------------------- Service-headless
+--- # ------------------------------------------------------------------------------------------- Service-ws
 apiVersion: v1
 kind: Service
 metadata:
@@ -20,30 +20,6 @@ spec:
     {{- with .Values.pod.labels }}
     {{- . | toYaml | nindent 4 }}
     {{- end }}
---- # ------------------------------------------------------------------------------------------- Service-gossip nodePort
-{{- if .Values.service.ws.nodeport }}
-apiVersion: v1
-kind: Service
-metadata:
-  name: gokv-ws-nodeport
-  labels:
-    {{- include "gokv.labels" . | nindent 4 }}    
-  annotations:
-    {{- include "gokv.defaultAnnotations" . | nindent 4 }}
-spec:
-  type: NodePort
-  ports:
-    - name: ws
-      port: 5334
-      protocol: TCP
-      targetPort: 5334
-      nodePort: {{ .Values.service.ws.nodeport }}
-  selector:
-    {{- include "gokv.selectorLabels" . | nindent 4 }}
-    {{- with .Values.pod.labels }}
-    {{- . | toYaml | nindent 4 }}
-    {{- end }}
-{{- end }}
 --- # ------------------------------------------------------------------------------------------- Service-http
 apiVersion: v1
 kind: Service
