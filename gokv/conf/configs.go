@@ -18,9 +18,12 @@ const (
 )
 
 var (
-	SELF_NAME string
-	SELF_UID  string
-	NC        *NodeConfig = &NodeConfig{}
+	SELF_NAME                   string
+	SELF_NAMESPACE              string
+	SELF_WEBSOCKET_SERVICE_NAME string
+	SELF_UID                    string
+	CLUSTER_INTERNAL_DOMAIN     string
+	NC                          *NodeConfig = &NodeConfig{}
 )
 
 // initialize the service from config file at $GOKV_HOME/gokv.yaml
@@ -35,33 +38,43 @@ func init() {
 		}
 	}
 
-	// get the own instance name
-	if s, ok := os.LookupEnv("INSTANCE_NAME"); ok {
-		SELF_NAME = s
-	} else {
-		if s, err := os.Hostname(); err != nil {
-			log.Fatalf("[ERR] where is my hostname?: %s\n", err.Error())
+	type envloader struct {
+		EnvVar      string
+		Dest        *string
+		DefaultFunc func() string
+	}
+
+	loadEnvs := func(el envloader) {
+		// ------------------------------------------------------ run the functions to load the envs
+		if s, ok := os.LookupEnv(el.EnvVar); ok {
+			*el.Dest = s
 		} else {
-			SELF_NAME = s
+			*el.Dest = el.DefaultFunc()
 		}
 	}
 
-	// get the uid, which is used to identify the websocket connections
-	if s, ok := os.LookupEnv("INSTANCE_UID"); ok {
-		SELF_UID = s
-	} else {
-		SELF_UID = uuid.New().String()
+	for _, el := range []envloader{
+		{
+			EnvVar: "INSTANCE_NAME", Dest: &SELF_NAME, DefaultFunc: func() string {
+				if s, err := os.Hostname(); err != nil {
+					log.Fatalf("[ERR] where is my hostname?: %s\n", err.Error())
+					return ""
+				} else {
+					return s
+				}
+			},
+		}, // get the own instance name
+		{EnvVar: "INSTANCE_NAMESPACE", Dest: &SELF_NAMESPACE, DefaultFunc: func() string { return "default" }},                       // get the own instance namespace
+		{EnvVar: "SELF_WEBSOCKET_SERVICE_NAME", Dest: &SELF_WEBSOCKET_SERVICE_NAME, DefaultFunc: func() string { return "gokv-ws" }}, // get the own instances websocket service name
+		{EnvVar: "CLUSTER_INTERNAL_DOMAIN", Dest: &CLUSTER_INTERNAL_DOMAIN, DefaultFunc: func() string { return "cluster.local" }},   // get the cluster interal url
+		{EnvVar: "INSTANCE_UID", Dest: &SELF_UID, DefaultFunc: func() string { return uuid.New().String() }},                         // get the uid, which is used to identify the websocket connections
+	} {
+		loadEnvs(el)
 	}
 }
 
 // this struct is parsed from an config yaml
 type NodeConfig struct {
-
-	// this anonymous struct contains information about the ha cluster
-	HA struct {
-		Nodes          []string `yaml:"nodes"`
-		SyncTimeoutSec int      `yaml:"syncTimeoutSec"`
-	} `yaml:"ha"`
 
 	// this key says if the debug function should be enabled
 	Debug bool `yaml:"debug"`

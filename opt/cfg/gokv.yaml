@@ -1,11 +1,3 @@
-ha:
-  nodes:
-    - uri: gokv-0
-      gossipPortTCP: 5334
-    - uri: gokv-1
-      gossipPortTCP: 5334
-    - uri: gokv-2
-      gossipPortTCP: 5334
 debug: false
 storage:
   type: cache

@@ -53,13 +53,9 @@ service:
 
 # this section contains the content of the gokv.yaml as raw string in vaml format. will be deployed as configmap
 gokv:
+  clusterInternalDomain: cluster.local
   # This is the content of the yaml file. If its empty, then the default will be used.
   yaml: |-
-    ha:
-      nodes: 
-        - gokv-0.gokv-ws.default
-        - gokv-1.gokv-ws.default
-        - gokv-2.gokv-ws.default
     debug: true
     storage:
       type: cache

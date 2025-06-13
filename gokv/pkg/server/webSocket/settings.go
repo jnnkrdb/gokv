@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
+	"sync"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
@@ -13,23 +13,18 @@ import (
 )
 
 const (
-	WebsocketPath string = "/"
+	WebsocketPath string = "/gossip"
 )
 
 var (
 	Connections = make(WsPool)
-	WsHeader    = make(http.Header)
 )
-
-func init() {
-	WsHeader.Add("x-gokv-node", conf.SELF_NAME)
-	WsHeader.Add("x-gokv-auth", conf.SELF_UID)
-}
 
 type WsPool map[string]*websocket.Conn
 
 func (wsp *WsPool) Send(request messaging.RequestCommand, vjson interface{}) error {
 
+	// used for the request, to identify later on
 	var uid string = uuid.New().String()
 
 	b, err := json.Marshal(vjson)
@@ -38,21 +33,35 @@ func (wsp *WsPool) Send(request messaging.RequestCommand, vjson interface{}) err
 		return err
 	}
 
-	var e error = nil
+	var (
+		e  error = nil
+		wg       = sync.WaitGroup{}
+	)
 
+	// add every conn to the waitgroup
+	wg.Add(len(*wsp))
+
+	// run through every connection and send the json struct
 	for n, conn := range *wsp {
-		log.Printf("[INF][%s] error parsing vjson: %v\n", n, err)
 
-		if err := conn.WriteJSON(messaging.WsRequest{
-			Initiator:      conf.SELF_NAME,
-			RequestCommand: request,
-			RequestUID:     uid,
-			Load:           b,
-		}); err != nil {
-			log.Printf("[WRN][%s] error sending ws request: %v\n", n, err)
-			e = fmt.Errorf("%s%s", e.Error(), fmt.Errorf("[%s]%s", n, err.Error()))
-		}
+		// run as goroutines to speed up requests
+		go func() {
+			log.Printf("[INF][%s] error parsing vjson: %v\n", n, err)
+
+			if err := conn.WriteJSON(messaging.WsRequest{
+				Initiator:      conf.SELF_NAME,
+				RequestCommand: request,
+				RequestUID:     uid,
+				Load:           b,
+			}); err != nil {
+				log.Printf("[WRN][%s] error sending ws request: %v\n", n, err)
+				e = fmt.Errorf("%s%s", e.Error(), fmt.Errorf("[%s]%s", n, err.Error()))
+			}
+		}()
 	}
+
+	// wait for all requests to be finished
+	wg.Wait()
 
 	return e
 }

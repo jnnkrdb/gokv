@@ -20,11 +20,11 @@ func main() {
 	// load the storage backend
 	conf.LoadStorage()
 
-	// start the own websocket endpoint
-	go websocket.RunWS(conf.GOSSIP_PORT)
+	// create the socket connection to existing nodes
+	websocket.CreateWSConnections()
 
-	// start the websocket connections
-	go websocket.CreateWSConnections()
+	// start the own websocket endpoint
+	go websocket.RunWS()
 
 	// running the test function printing the current storage
 	go func() {

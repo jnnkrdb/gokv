@@ -1,8 +1,10 @@
 package websocket
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"net/url"
 	"strings"
 
@@ -17,68 +19,49 @@ type NodePool struct {
 // the init function tries to connect to the service inside the cluster, to
 // gather the current nodes in the gokv-cluster. Then tries to open a connection
 // to every node
-func init() {
-
-}
-
-// create the required connections to the other nodes
 func CreateWSConnections() {
 
-	for _, node := range conf.NC.HA.Nodes {
-
-		if strings.Contains(node, conf.SELF_NAME) {
-			continue
-		}
-
-		// create url
-		u := url.URL{
-			Scheme: "ws",
-			Host:   fmt.Sprintf("%s:%d", node, conf.GOSSIP_PORT),
-			Path:   WebsocketPath,
-		}
-		log.Printf("[INF] connecting to url: %s\n", u.String())
-
-		if c, _, err := websocket.DefaultDialer.Dial(u.String(), nil); err != nil {
-
-			log.Printf("[ERR] couldn't connect to [%s]: %v\n", u.String(), err)
-
-		} else {
-
-			HandleWebSocketConnection(node, c)
-		}
+	var u = url.URL{
+		Scheme: "http",
+		Host:   fmt.Sprintf("%s.%s.svc.%s:%d", conf.SELF_WEBSOCKET_SERVICE_NAME, conf.SELF_NAMESPACE, conf.CLUSTER_INTERNAL_DOMAIN, conf.GOSSIP_PORT),
+		Path:   "/api/v1/connections",
 	}
-}
 
-/*
-func runClient(port int) {
+	if resp, err := http.Get(u.String()); err != nil {
 
-	ticker := time.NewTicker(time.Second)
-	defer ticker.Stop()
+		log.Printf("[ERR] couldn't connect to [%s], are there other hosts running?: %v\n", u.String(), err)
 
-	for {
-		select {
-		case t := <-ticker.C:
-			err := c.WriteMessage(websocket.TextMessage, []byte(t.String()))
-			if err != nil {
-				log.Println("write:", err)
-				return
-			}
-		case <-interrupt:
-			log.Println("interrupt")
+	} else {
 
-			// Cleanly close the connection by sending a close message and then
-			// waiting (with timeout) for the server to close the connection.
-			err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-			if err != nil {
-				log.Println("write close:", err)
-				return
-			}
-			select {
-			case <-done:
-			case <-time.After(time.Second):
-			}
+		var np = NodePool{}
+		if err = json.NewDecoder(resp.Body).Decode(&np); err != nil {
+			log.Printf("[ERR] couldn't decode the received response body: %v\n", err)
 			return
 		}
+
+		// range through the received nodes and creat the connections
+		for _, node := range np.Nodes {
+
+			if strings.Contains(node, conf.SELF_NAME) {
+				continue
+			}
+
+			// create url
+			u := url.URL{
+				Scheme: "ws",
+				Host:   fmt.Sprintf("%s:%d", node, conf.GOSSIP_PORT),
+				Path:   WebsocketPath,
+			}
+			log.Printf("[INF] connecting to url: %s\n", u.String())
+
+			if c, _, err := websocket.DefaultDialer.Dial(u.String(), nil); err != nil {
+
+				log.Printf("[ERR] couldn't connect to [%s]: %v\n", u.String(), err)
+
+			} else {
+
+				HandleWebSocketConnection(node, c)
+			}
+		}
 	}
 }
-*/

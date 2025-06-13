@@ -1,0 +1,27 @@
+--- # ------------------------------------------------------------------------------------------- ConfigMap
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gokv-ws
+  labels:
+    {{- include "gokv.labels" . | nindent 4 }}    
+  annotations:
+    {{- include "gokv.defaultAnnotations" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "gokv.selectorLabels" . | nindent 6 }}      
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "gokv.selectorLabels" . | nindent 14 }}
+      ports:
+        - port: 5334
+          protocol: TCP
+    - from:
+        - podSelector: {}
+          namespaceSelector: {}
+      ports:
+        - port: 80
+          protocol: TCP
