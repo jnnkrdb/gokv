@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -47,6 +48,9 @@ func main() {
 
 					log.Printf("\nBucket [%s]:\nKeys: %v", bucketList[i], keyList)
 				}
+
+				// request current nodes in cluster
+				fmt.Printf("[INF] current nodes: %v\n", websocket.GetNodes())
 			}
 		}
 	}()
