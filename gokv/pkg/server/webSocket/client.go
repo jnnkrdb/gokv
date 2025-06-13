@@ -49,18 +49,27 @@ func CreateWSConnections() {
 			// create url
 			u := url.URL{
 				Scheme: "ws",
-				Host:   fmt.Sprintf("%s:%d", node, conf.GOSSIP_PORT),
+				Host:   fmt.Sprintf("%s.%s.%s.svc.%s:%d", node, conf.SELF_WEBSOCKET_SERVICE_NAME, conf.SELF_NAMESPACE, conf.CLUSTER_INTERNAL_DOMAIN, conf.GOSSIP_PORT),
 				Path:   WebsocketPath,
 			}
 			log.Printf("[INF] connecting to url: %s\n", u.String())
 
-			if c, _, err := websocket.DefaultDialer.Dial(u.String(), nil); err != nil {
+			// trying to connect to the node, if it does not work, then retry
+			var currentRetry int = 1
+			for {
 
-				log.Printf("[ERR] couldn't connect to [%s]: %v\n", u.String(), err)
+				if c, _, err := websocket.DefaultDialer.Dial(u.String(), nil); err != nil {
 
-			} else {
+					log.Printf("[ERR][try-%d] couldn't connect to [%s]: %v\n", currentRetry, u.String(), err)
 
-				HandleWebSocketConnection(node, c)
+				} else {
+
+					go HandleWebSocketConnection(node, c)
+
+					return
+				}
+
+				currentRetry++
 			}
 		}
 	}

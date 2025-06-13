@@ -6,6 +6,9 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jnnkrdb/gokv/conf"
+	"github.com/jnnkrdb/gokv/pkg/gossip/functions"
+	"github.com/jnnkrdb/gokv/pkg/messaging"
+	websocket "github.com/jnnkrdb/gokv/pkg/server/webSocket"
 )
 
 func DeleteBucket(w http.ResponseWriter, r *http.Request) {
@@ -23,6 +26,12 @@ func DeleteBucket(w http.ResponseWriter, r *http.Request) {
 		log.Printf("[ERR] couldn't delete bucket from storage: %v\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
+
+		websocket.Connections.Send(messaging.RC_SyncStorage, functions.SyncStorageLoad{
+			Sync:   functions.SyncStorageLoad_Sync_Delete,
+			Bucket: b,
+		})
+
 		w.Write([]byte("OK"))
 	}
 }

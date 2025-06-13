@@ -16,6 +16,7 @@ func RunHTTPSocket(port int) {
 	log.Printf("[INF] starting http socket on :%d\n", port)
 
 	// handle the storage api
+	router.Handle("/api/v1/storage/export", http.HandlerFunc(apiv1_storage.Export)).Methods("GET", "OPTIONS")
 	router.Handle("/api/v1/storage/buckets", http.HandlerFunc(apiv1_storage.ListBuckets)).Methods("GET", "OPTIONS")
 	router.Handle("/api/v1/storage/buckets/{bucket}/keys", http.HandlerFunc(apiv1_storage.ListKeys)).Methods("GET", "OPTIONS")
 	router.Handle("/api/v1/storage/buckets/{bucket}/keys/{key}/value", http.HandlerFunc(apiv1_storage.GetKey)).Methods("GET", "OPTIONS")
