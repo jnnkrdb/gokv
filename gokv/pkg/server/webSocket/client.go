@@ -68,6 +68,7 @@ func CreateWSConnections() {
 			Host:   fmt.Sprintf("%s.%s.%s.svc.%s:%d", node, conf.SELF_WEBSOCKET_HEADLESS_SERVICE_NAME, conf.SELF_NAMESPACE, conf.CLUSTER_INTERNAL_DOMAIN, conf.GOSSIP_PORT),
 			Path:   WebsocketPath,
 		}
+
 		log.Printf("[INF] connecting to url: %s\n", u.String())
 
 		// trying to connect to the node, if it does not work, then retry
