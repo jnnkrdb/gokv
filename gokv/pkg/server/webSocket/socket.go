@@ -48,13 +48,13 @@ func RunWS() {
 	wsRouter.HandleFunc(WebsocketPath, func(w http.ResponseWriter, r *http.Request) {
 
 		// upgrade the connection to a websocket
-		if c, err := upgrader.Upgrade(w, r, nil); err != nil {
+		if c, err := upgrader.Upgrade(w, r, WsHeader); err != nil {
 
 			log.Printf("[WRN][%s] error upgrading to websocket conn\n", r.URL.String())
 
 		} else {
 
-			HandleWebSocketConnection(r.Header.Get("gokv.jnnkrdb.de/node"), c)
+			go HandleWebSocketConnection(r.Header.Get("gokv-node"), c)
 		}
 	})
 

@@ -18,12 +18,13 @@ const (
 )
 
 var (
-	SELF_NAME                   string
-	SELF_NAMESPACE              string
-	SELF_WEBSOCKET_SERVICE_NAME string
-	SELF_UID                    string
-	CLUSTER_INTERNAL_DOMAIN     string
-	NC                          *NodeConfig = &NodeConfig{}
+	SELF_NAME                            string
+	SELF_NAMESPACE                       string
+	SELF_WEBSOCKET_SERVICE_NAME          string
+	SELF_WEBSOCKET_HEADLESS_SERVICE_NAME string
+	SELF_UID                             string
+	CLUSTER_INTERNAL_DOMAIN              string
+	NC                                   *NodeConfig = &NodeConfig{}
 )
 
 // initialize the service from config file at $GOKV_HOME/gokv.yaml
@@ -64,10 +65,11 @@ func init() {
 				}
 			},
 		}, // get the own instance name
-		{EnvVar: "INSTANCE_NAMESPACE", Dest: &SELF_NAMESPACE, DefaultFunc: func() string { return "default" }},                       // get the own instance namespace
-		{EnvVar: "SELF_WEBSOCKET_SERVICE_NAME", Dest: &SELF_WEBSOCKET_SERVICE_NAME, DefaultFunc: func() string { return "gokv-ws" }}, // get the own instances websocket service name
-		{EnvVar: "CLUSTER_INTERNAL_DOMAIN", Dest: &CLUSTER_INTERNAL_DOMAIN, DefaultFunc: func() string { return "cluster.local" }},   // get the cluster interal url
-		{EnvVar: "INSTANCE_UID", Dest: &SELF_UID, DefaultFunc: func() string { return uuid.New().String() }},                         // get the uid, which is used to identify the websocket connections
+		{EnvVar: "INSTANCE_NAMESPACE", Dest: &SELF_NAMESPACE, DefaultFunc: func() string { return "default" }},                                                  // get the own instance namespace
+		{EnvVar: "SELF_WEBSOCKET_SERVICE_NAME", Dest: &SELF_WEBSOCKET_SERVICE_NAME, DefaultFunc: func() string { return "gokv-ws" }},                            // get the own instances websocket service name
+		{EnvVar: "SELF_WEBSOCKET_HEADLESS_SERVICE_NAME", Dest: &SELF_WEBSOCKET_HEADLESS_SERVICE_NAME, DefaultFunc: func() string { return "gokv-ws-headless" }}, // get the own instances websocket service name
+		{EnvVar: "CLUSTER_INTERNAL_DOMAIN", Dest: &CLUSTER_INTERNAL_DOMAIN, DefaultFunc: func() string { return "cluster.local" }},                              // get the cluster interal url
+		{EnvVar: "INSTANCE_UID", Dest: &SELF_UID, DefaultFunc: func() string { return uuid.New().String() }},                                                    // get the uid, which is used to identify the websocket connections
 	} {
 		loadEnvs(el)
 	}

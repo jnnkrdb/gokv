@@ -7,7 +7,7 @@ import (
 )
 
 func HandleWebSocketConnection(uid string, c *websocket.Conn) {
-	defer c.Close()
+	defer c.Close() // close if the function gets finished
 
 	// if there already is an connection then skip this part
 	if _, ok := Connections[uid]; ok {
@@ -19,7 +19,6 @@ func HandleWebSocketConnection(uid string, c *websocket.Conn) {
 	Connections[uid] = c
 
 	defer func() {
-		c.Close()                // close if the function gets finished
 		delete(Connections, uid) // deleting conn from pool
 		CreateWSConnections()    // trying to reconnect to closed butdesired connections
 	}()

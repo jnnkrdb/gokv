@@ -7,13 +7,21 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/jnnkrdb/gokv/conf"
 )
 
+var WsHeader = make(http.Header)
+
 type NodePool struct {
 	Nodes []string `json:"nodes"`
+}
+
+func init() {
+	WsHeader.Add("gokv-node", conf.SELF_NAME)
+	WsHeader.Add("gokv-uid", conf.SELF_UID)
 }
 
 // the init function tries to connect to the service inside the cluster, to
@@ -49,7 +57,7 @@ func CreateWSConnections() {
 			// create url
 			u := url.URL{
 				Scheme: "ws",
-				Host:   fmt.Sprintf("%s.%s.%s.svc.%s:%d", node, conf.SELF_WEBSOCKET_SERVICE_NAME, conf.SELF_NAMESPACE, conf.CLUSTER_INTERNAL_DOMAIN, conf.GOSSIP_PORT),
+				Host:   fmt.Sprintf("%s.%s.%s.svc.%s:%d", node, conf.SELF_WEBSOCKET_HEADLESS_SERVICE_NAME, conf.SELF_NAMESPACE, conf.CLUSTER_INTERNAL_DOMAIN, conf.GOSSIP_PORT),
 				Path:   WebsocketPath,
 			}
 			log.Printf("[INF] connecting to url: %s\n", u.String())
@@ -58,7 +66,7 @@ func CreateWSConnections() {
 			var currentRetry int = 1
 			for {
 
-				if c, _, err := websocket.DefaultDialer.Dial(u.String(), nil); err != nil {
+				if c, _, err := websocket.DefaultDialer.Dial(u.String(), WsHeader); err != nil {
 
 					log.Printf("[ERR][try-%d] couldn't connect to [%s]: %v\n", currentRetry, u.String(), err)
 
@@ -70,6 +78,7 @@ func CreateWSConnections() {
 				}
 
 				currentRetry++
+				time.Sleep(5 * time.Second)
 			}
 		}
 	}

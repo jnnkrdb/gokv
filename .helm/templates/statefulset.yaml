@@ -11,7 +11,7 @@ spec:
   replicas: {{ default 3 .Values.service.replicas }}
   revisionHistoryLimit: 3
   minReadySeconds: 10
-  serviceName: gokv-ws
+  serviceName: gokv-ws-headless
   selector:
     matchLabels:
       {{- include "gokv.selectorLabels" . | nindent 6 }}    
@@ -68,6 +68,8 @@ spec:
                   fieldPath: metadata.namespace
             - name: SELF_WEBSOCKET_SERVICE_NAME
               value: "gokv-ws"
+            - name: SELF_WEBSOCKET_HEADLESS_SERVICE_NAME
+              value: "gokv-ws-headless"
             - name: CLUSTER_INTERNAL_DOMAIN
               value: {{ default "cluster.local" .Values.gokv.clusterInternalDomain | quote }}
             - name: INSTANCE_UID
