@@ -47,6 +47,11 @@ func RunWS() {
 	// handle the websocket registration
 	wsRouter.HandleFunc(WebsocketPath, func(w http.ResponseWriter, r *http.Request) {
 
+		// if debug is enabled, then print the received headers
+		if conf.NC.Debug {
+			log.Printf("[INF][%s] received headers: %v\n", r.URL.String(), r.Header)
+		}
+
 		// upgrade the connection to a websocket
 		if c, err := upgrader.Upgrade(w, r, WsHeader); err != nil {
 
