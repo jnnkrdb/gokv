@@ -58,36 +58,44 @@ func CreateWSConnections() {
 	// range through the received nodes and creat the connections
 	for _, node := range GetNodes() {
 
-		if strings.Contains(node, conf.SELF_NAME) {
-			continue
+		if !strings.Contains(node, conf.SELF_NAME) {
+			go CreateWSConnectionToNode(node)
+		}
+	}
+}
+
+// create the connection to a specifc node in the cluster
+func CreateWSConnectionToNode(node string) {
+
+	// host should look similiar to this:
+	//   - gokv-x.gokv-ws-headless.default.svc.cluster.local:5334
+	var hostNode string = fmt.Sprintf("%s.%s.%s.svc.%s:%d", node, conf.SELF_WEBSOCKET_HEADLESS_SERVICE_NAME, conf.SELF_NAMESPACE, conf.CLUSTER_INTERNAL_DOMAIN, conf.GOSSIP_PORT)
+
+	// create url
+	u := url.URL{
+		Scheme: "ws",
+		Host:   hostNode,
+		Path:   WebsocketPath,
+	}
+
+	log.Printf("[INF] connecting to url: %s\n", u.String())
+
+	// trying to connect to the node, if it does not work, then retry
+	var currentRetry int = 1
+	for {
+
+		if c, _, err := websocket.DefaultDialer.Dial(u.String(), WsHeader); err != nil {
+
+			log.Printf("[ERR][try-%d] couldn't connect to [%s]: %v\n", currentRetry, u.String(), err)
+
+		} else {
+
+			go HandleWebSocketConnection(node, c)
+
+			return
 		}
 
-		// create url
-		u := url.URL{
-			Scheme: "ws",
-			Host:   fmt.Sprintf("%s.%s.%s.svc.%s:%d", node, conf.SELF_WEBSOCKET_HEADLESS_SERVICE_NAME, conf.SELF_NAMESPACE, conf.CLUSTER_INTERNAL_DOMAIN, conf.GOSSIP_PORT),
-			Path:   WebsocketPath,
-		}
-
-		log.Printf("[INF] connecting to url: %s\n", u.String())
-
-		// trying to connect to the node, if it does not work, then retry
-		var currentRetry int = 1
-		for {
-
-			if c, _, err := websocket.DefaultDialer.Dial(u.String(), WsHeader); err != nil {
-
-				log.Printf("[ERR][try-%d] couldn't connect to [%s]: %v\n", currentRetry, u.String(), err)
-
-			} else {
-
-				go HandleWebSocketConnection(node, c)
-
-				return
-			}
-
-			currentRetry++
-			time.Sleep(5 * time.Second)
-		}
+		currentRetry++
+		time.Sleep(5 * time.Second)
 	}
 }

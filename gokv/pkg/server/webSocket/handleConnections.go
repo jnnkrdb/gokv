@@ -9,6 +9,8 @@ import (
 func HandleWebSocketConnection(uid string, c *websocket.Conn) {
 	defer c.Close() // close if the function gets finished
 
+	log.Printf("[INF][%s] handling ws connection\n", uid)
+
 	// if there already is an connection then skip this part
 	if _, ok := Connections[uid]; ok {
 		log.Printf("[WRN][%s] ws connection does already exist\n", uid)
